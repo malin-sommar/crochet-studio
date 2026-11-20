@@ -32,6 +32,12 @@ export const SCHEMA_HISTORY: readonly SchemaVersion[] = [
       portfolio: CONTENT_INDEXES,
     },
   },
+  {
+    // Phase 3: your own notes and video link per stitch; the record id is the stitch id.
+    // A new store only, so existing records don't change.
+    version: 2,
+    stores: { stitchNotes: 'id, updatedAt' },
+  },
 ];
 
 export const CURRENT_DB_VERSION = SCHEMA_HISTORY[SCHEMA_HISTORY.length - 1]!.version;
@@ -41,7 +47,7 @@ export const CONTENT_STORES = ['charts', 'designs', 'portfolio'] as const;
 export type ContentStore = (typeof CONTENT_STORES)[number];
 
 /** Every store that goes into a backup file. */
-export const BACKUP_STORES = ['settings', ...CONTENT_STORES] as const;
+export const BACKUP_STORES = ['settings', ...CONTENT_STORES, 'stitchNotes'] as const;
 export type BackupStore = (typeof BACKUP_STORES)[number];
 
 export const STORE_LABELS: Record<BackupStore, string> = {
@@ -49,6 +55,7 @@ export const STORE_LABELS: Record<BackupStore, string> = {
   charts: 'Charts',
   designs: 'Designs',
   portfolio: 'Portfolio',
+  stitchNotes: 'Stitch notes',
 };
 
 export class CrochetDB extends Dexie {
@@ -56,6 +63,7 @@ export class CrochetDB extends Dexie {
   charts!: Table<AnyRecord, string>;
   designs!: Table<AnyRecord, string>;
   portfolio!: Table<AnyRecord, string>;
+  stitchNotes!: Table<AnyRecord, string>;
 
   /** `upTo` opens the database as an older version of the app would (used by the upgrade test). */
   constructor(name: string = DB_NAME, upTo: number = Infinity) {

@@ -22,4 +22,15 @@ export const DB_FIXTURES: Record<
       portfolio: [],
     },
   },
+  2: {
+    seed: {
+      settings: [{ id: 'prefs', createdAt: 1763640000000, updatedAt: 1763650000000, terms: 'sv' }],
+      charts: [{ id: 'c1', createdAt: 1763640000000, updatedAt: 1763640000500, name: 'Heart' }],
+      designs: [],
+      portfolio: [],
+      stitchNotes: [
+        { id: 'moss', createdAt: 1763650000000, updatedAt: 1763650000000, text: 'Change color every 2 rows.', link: '' },
+      ],
+    },
+  },
 };

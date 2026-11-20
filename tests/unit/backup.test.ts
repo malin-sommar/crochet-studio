@@ -183,7 +183,7 @@ describe('importing', () => {
     const preview = await previewImport(file);
     expect(preview.total.added).toBe(5);
     expect(preview.stores.charts).toEqual({ added: 2, updated: 0, toTrash: 0, kept: 0 });
-    expect(await dumpDb()).toEqual({ settings: [], charts: [], designs: [], portfolio: [] });
+    expect(await dumpDb()).toEqual({ settings: [], charts: [], designs: [], portfolio: [], stitchNotes: [] });
   });
 
   test('importing the same file twice changes nothing the second time', async () => {
