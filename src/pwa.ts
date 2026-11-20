@@ -1,4 +1,5 @@
 import { registerSW } from 'virtual:pwa-register';
+import { saveEverything } from './lib/pendingSaves';
 import { signal } from './lib/signal';
 import { requestPersistentStorage } from './storage/persist';
 
@@ -40,8 +41,13 @@ export function startPwa(): void {
 }
 
 export async function applyUpdate(): Promise<void> {
-  if (update) await update(true);
-  else window.location.reload();
+  await saveEverything();
+  // Usually the new version is waiting: this tells it to take over, and the page reloads once it has.
+  if (update) void update(true);
+  // Sometimes the new version is already running in the background (for example when this page
+  // wasn't opened through the offline copy), and nothing would reload the page. Then reload here,
+  // which opens the new version.
+  setTimeout(() => window.location.reload(), 1500);
 }
 
 export async function promptInstall(): Promise<boolean> {

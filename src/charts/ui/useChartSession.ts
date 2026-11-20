@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { onBeforeLeave } from '../../lib/pendingSaves';
 import type { ChartContent } from '../model';
 import { loadChart, saveChart, type ChartRecord } from '../store';
 
@@ -59,9 +60,11 @@ export function useChartSession(id: string): ChartSession {
     const onPageHide = () => void flush();
     document.addEventListener('visibilitychange', onHidden);
     window.addEventListener('pagehide', onPageHide);
+    const unregister = onBeforeLeave(flush);
     return () => {
       document.removeEventListener('visibilitychange', onHidden);
       window.removeEventListener('pagehide', onPageHide);
+      unregister();
       void flush();
     };
   }, [flush]);
