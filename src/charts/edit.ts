@@ -13,6 +13,30 @@ export function setCell(cells: readonly string[], row: number, col: number, valu
   return out;
 }
 
+/** The squares on a straight line from `a` to `b`, not including `a` (Bresenham's line). */
+export function lineCells(a: { x: number; y: number }, b: { x: number; y: number }): { x: number; y: number }[] {
+  const out: { x: number; y: number }[] = [];
+  const dx = Math.abs(b.x - a.x);
+  const dy = -Math.abs(b.y - a.y);
+  const sx = a.x < b.x ? 1 : -1;
+  const sy = a.y < b.y ? 1 : -1;
+  let err = dx + dy;
+  let { x, y } = a;
+  while (x !== b.x || y !== b.y) {
+    const e2 = 2 * err;
+    if (e2 >= dy) {
+      err += dy;
+      x += sx;
+    }
+    if (e2 <= dx) {
+      err += dx;
+      y += sy;
+    }
+    out.push({ x, y });
+  }
+  return out;
+}
+
 export function colorCounts(c: ChartContent): number[] {
   const counts = new Array<number>(c.pal.length).fill(0);
   for (const row of c.cells) for (const ch of row) counts[Number(ch)] = (counts[Number(ch)] ?? 0) + 1;

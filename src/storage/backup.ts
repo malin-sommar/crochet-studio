@@ -71,7 +71,7 @@ export function readBackup(text: string): BackupFile {
   if (raw.app === 'tapestry-chart-tracker') {
     throw new BackupError(
       'This is a project file from the Tapestry Chart Tracker, not a backup. ' +
-        'Chart files will open in the Charts tab once it is built.',
+        'Open it from the Charts tab with "Open project file".',
     );
   }
   if (raw.app !== BACKUP_APP) throw new BackupError(NOT_A_BACKUP);

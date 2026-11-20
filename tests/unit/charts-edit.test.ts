@@ -7,6 +7,7 @@ import {
   colorCounts,
   flip,
   goToRow,
+  lineCells,
   markDoneAndNext,
   mirror,
   previousRow,
@@ -34,6 +35,19 @@ describe('editing', () => {
   test('painting one square leaves the others alone', () => {
     expect(setCell(small.cells, 1, 3, 2)).toEqual(['0120', '1102', '0002']);
     expect(small.cells[1]).toBe('1100');
+  });
+
+  test('a fast brush stroke fills in the squares it jumped over', () => {
+    expect(lineCells({ x: 0, y: 0 }, { x: 3, y: 0 })).toEqual([
+      { x: 1, y: 0 },
+      { x: 2, y: 0 },
+      { x: 3, y: 0 },
+    ]);
+    expect(lineCells({ x: 2, y: 2 }, { x: 0, y: 0 })).toEqual([
+      { x: 1, y: 1 },
+      { x: 0, y: 0 },
+    ]);
+    expect(lineCells({ x: 0, y: 0 }, { x: 0, y: 0 })).toEqual([]);
   });
 
   test('counts stitches per color', () => {
