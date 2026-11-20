@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Full-bleed version for Android, which crops icons to its own shape. The ball stays inside the safe circle. -->
+  <rect width="64" height="64" fill="#faf6ef"/>
+  <g transform="translate(32 32) scale(0.74) translate(-32 -32)">
+    <clipPath id="ball"><circle cx="30" cy="30" r="21"/></clipPath>
+    <path d="M44 45c4 5 9 8 14 7" fill="none" stroke="#8c1d3c" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="30" cy="30" r="21" fill="#8c1d3c"/>
+    <g clip-path="url(#ball)" fill="none" stroke="#faf6ef" stroke-width="2.4" stroke-linecap="round">
+      <circle cx="58" cy="58" r="24"/>
+      <circle cx="58" cy="58" r="32"/>
+      <circle cx="58" cy="58" r="40"/>
+      <circle cx="2" cy="60" r="27"/>
+      <circle cx="2" cy="60" r="36"/>
+    </g>
+  </g>
+</svg>
