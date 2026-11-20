@@ -1,0 +1,34 @@
+{
+ "app": "tapestry-chart-tracker",
+ "version": 2,
+ "project": {
+  "name": "",
+  "w": 4,
+  "h": 3,
+  "cells": [
+   "0110",
+   "1001",
+   "0110"
+  ],
+  "pal": [
+   {
+    "name": "Cream",
+    "hex": "#f3ead8"
+   },
+   {
+    "name": "",
+    "hex": "not a color"
+   }
+  ],
+  "active": 1,
+  "cur": 9,
+  "done": [
+   2,
+   2,
+   7,
+   1
+  ],
+  "example": false,
+  "updated": 1700000000000
+ }
+}
