@@ -58,12 +58,20 @@ Source: `../tapestry-tracker/` (`tracker.html`, plus its README.md and CLAUDE.md
 - **Hosting:** GitHub Pages, deployed by GitHub Actions on every push to `main` after the tests pass. Address: https://malin-sommar.github.io/crochet-studio/. Use that address on both devices; `localhost` is for development and has its own separate data.
 - **Sync:** not now. Backup export and import is enough. Moving between devices = save a backup, put it on Google Drive (or email it), import it on the other device. Every record has `id`, `updatedAt` and `deletedAt`, so a real sync can be added later without a migration.
 - **Language:** English UI. Stitch names are shown in US terms first, with a setting to switch to UK or Swedish. The other names are shown next to them, and Swedish terms are in the library for looking up.
-- **Tests:** Vitest (with fake-indexeddb) for logic. Playwright with Chromium only, at desktop size and a 390 px Android phone (no WebKit, since there's no iPhone).
+- **Tests:** Vitest (with fake-indexeddb) for logic, plus Vitest browser mode (Chromium) for anything that needs real image decoding, canvas or pdf.js. Playwright with Chromium only, at desktop size and a 390 px Android phone (no WebKit, since there's no iPhone).
 - **Drawing and PDFs (unchanged):** canvas for charts and fabric previews; SVG for stitch diagrams. pdf.js and pdf-lib, from npm and loaded only when needed.
+
+### Phase 2 decisions (agreed 2026-11-20)
+- **Moving tracker charts:** one project file per chart, downloaded from the tracker and opened here (Charts → Open project file, or Settings → Import). The tracker itself is not changed.
+- **Example chart:** a "Try an example" button on the empty chart list, instead of a chart created on first visit.
+- **Keep the screen on** in crochet mode (Wake Lock) is part of Phase 2, with a switch to turn it off.
+- **Project files** are written in the tracker's format (`{app:"tapestry-chart-tracker", version:2, project}`), so they open in both apps.
+- **Test PDFs:** the repository is public, so real (bought) patterns never go in it. Tests use a generated Stitch Fiddle look-alike. Real PDFs can go in `tests/fixtures/private/` (git-ignored), where `npm test` checks that their numbers are read.
+- **The tracker's "later" ideas** (carry hints, lone stitches, yarn per color) wait until after the port.
 
 ## Phases
 1. ✅ App shell: tabs, routing, theme (light and dark), storage layer, export/import of everything. Also PWA install and offline, and GitHub Pages deploy.
-2. Port the tapestry and mosaic tracker with all features and tests. Import existing project files.
+2. ✅ Port the tapestry and mosaic tracker with all features and tests. Import existing project files.
 3. Stitch library (start with about 15 stitches, then grow it).
 4. Scarf and blanket maker: create mode, preview, crochet mode, yarn estimate.
 5. Portfolio with photos.
@@ -87,9 +95,38 @@ Source: `../tapestry-tracker/` (`tracker.html`, plus its README.md and CLAUDE.md
 - **Tests:** 61 unit tests (storage, Trash, merge rules, backup round trip, moving back and forth between two devices, damaged files, a test that every database version upgrades, a test that every backup format still imports, routing, theme, dates). 20 Playwright tests: each tab at desktop and phone size, no sideways scrolling, tap-target size, theme and terms saved across reloads, backup saved on one browser and imported in a fresh one, a tracker file refused, the install manifest.
 - **Not covered by browser tests yet:** the Trash and the backup reminder in the UI (nothing can create content until Phase 2; their logic is unit-tested), and the service worker (blocked in tests to avoid stale caches).
 
+### Phase 2: tapestry and mosaic charts (2026-11-20)
+- **Pages** (`src/charts/ui/`, routed from `src/pages/ChartsPage.tsx`):
+  - `#/charts` lists the charts with a thumbnail, size, technique and progress. Buttons: New chart, Import picture or PDF, Open project file, Paste chart code. When the list is empty there's a "Try an example" button.
+  - `#/charts/<id>` is edit mode: Paint/Scroll, Undo (60 steps, per session), color picker, zoom, mosaic check, reversible back preview. Then cards for colors (names, shades, stitch counts, add/remove), size and shape (resize, 3-stitch border, mirror, flip), technique (tapestry/mosaic, reversible, row 1 color) and "This chart" (rename, Download PDF, Download project file, Duplicate, chart code, Delete to the Trash).
+  - `#/charts/<id>/crochet` is crochet mode: the current row in big type with its color blocks in working order, direction and colors, the chart scrolled to the row (tap a row to jump), all rows with done ticks, how to work it, keep the screen on, clear progress. On a phone the tab bar is hidden and the Previous / "Done, next row" buttons sit at the bottom. Backup banners are hidden here.
+  - `#/charts/import` imports a picture or PDF: drag to select the chart area, correct squares across/down, choose the number of colors, name it, create.
+- **Logic** (`src/charts/`, no browser needed except where noted):
+  - `model.ts`: the chart type, strict reading of tracker files and chart codes (including the oldest formats), project files.
+  - `edit.ts`: drawing, resize, border, mirror, flip, colors, progress.
+  - `rows.ts`: tapestry rows in working order.
+  - `mosaic.ts`: overlay mosaic stitches, rule check, back preview.
+  - `importImage.ts`: grid detection and color grouping.
+  - `pdfLabels.ts`: reading the grid from printed row and column numbers.
+  - `pdfExport.ts`: PDF export.
+  - `importBrowser.ts` and `importPdf.ts` (browser only): picture decoding and pdf.js.
+  - `store.ts`: saving charts.
+  - `view.ts`: per-device zoom, tool and color.
+- **Saving:** a chart record is the tracker's project fields (`name, w, h, cells, pal, tech, rev, mfirst, cur, done`) plus the shared record fields. Progress travels with backups; zoom, tool and the paint color are per device (localStorage `cs-chart-views`). Changes save 0.4 s after the last edit, and at once when the app is hidden, closed or the chart is left. A record that can't be read is hidden from the list but never deleted. No database or backup format change was needed (still version 1 / format 1).
+- **Offline:** pdf.js, its worker and pdf-lib load only when used, and are cached by the service worker (about 2.5 MB cached in total).
+- **Tests:** 243 Vitest tests (in Node and in Chromium; one more is skipped until a private PDF is added) and 42 Playwright tests in total. They cover:
+  - The tracker's test list: 1:1 pixel art, scaled pixel art, chart screenshots with grid lines including JPEG, a Stitch Fiddle-style PDF with row numbers split between both sides, and 40 random mosaic round trips.
+  - Plus: old tracker files, chart codes, editing, rows, PDF export, a 20-file JPEG sweep, and end-to-end paint/undo, crochet progress across reloads, tracker files, paste, downloads, Trash, picture and PDF import, and backups that carry charts.
+
 ### Changes to the plan
 - PWA install and offline use moved from "more ideas" into Phase 1, since the phone is a main device.
 - Sharing a backup straight to Drive with the Android share sheet isn't possible: Chrome won't share `.json` files. The backup is a normal download instead.
+- Phase 2 import is more reliable than the tracker's. Each fix has its own tests:
+  - Scaled pixel art wider than 200 px could be read as 2 or 3 squares per square.
+  - JPEG ringing could be taken for grid lines.
+  - pdf.js joins closely spaced column numbers ("9 10 11 12") into one piece of text; these are now split again.
+- Settings → Import now opens a tracker project file as a new chart instead of refusing it.
+- The first backup reminder waits until there's work at least 2 days old, so it doesn't appear right after the first chart.
 
 ## Working agreements for Claude
 - Read this file and `../tapestry-tracker/CLAUDE.md` before changing anything.
@@ -101,10 +138,13 @@ Source: `../tapestry-tracker/` (`tracker.html`, plus its README.md and CLAUDE.md
 - Keep the UI usable at phone width (about 390 px). Tap targets are at least 48 px (`--tap`).
 - Ask before adding a large dependency or changing the tech stack.
 - Stitch descriptions and pictures are original. Don't copy text or images from tutorial sites or paid patterns, and never bake a purchased pattern into the app's code or sample data.
+- Never commit real patterns. Generated test pictures and PDFs live in `tests/support/`; real ones only in the git-ignored `tests/fixtures/private/`.
+- Any change to grid detection must keep every test in `tests/unit/charts-import-image.test.ts` and `tests/browser/` passing. The sweeps there exist because single examples kept hiding problems.
 - Run `npm run test:all` before committing. CI runs the same checks and blocks the deploy if they fail.
 - After each phase, update this file: what was built, what changed in the plan, open questions.
 
 ## Open questions
 - App name: "Crochet Studio" for now. It appears in `vite.config.ts` (manifest), `index.html` and the brand in `TabNav.tsx`.
-- Phase 2: the existing tracker projects live inside the claude.ai artifact (its localStorage and account database), which this app can't read. Should the tracker get an "Export all projects" button, so moving them is one file instead of one file per chart?
-- Phase 2: what should a chart record look like in the `charts` store? Proposal: the tracker's project fields (`name, w, h, cells, pal, active, cur, done, tech, rev, mfirst`) plus the shared record fields, with the tracker's `normalize` rules for reading old files.
+- PDF import is only tested against a generated look-alike of a Stitch Fiddle PDF. A real one (in `tests/fixtures/private/`) would confirm it, since real PDFs may space or rotate their numbers differently.
+- Two very similar colors (for example navy and dark green) in a JPEG can merge when the number of colors is Automatic. Choosing the number fixes it. Is that good enough, or should Automatic be smarter?
+- Not yet tried on a real Android phone: painting with a finger, keep-screen-on, install, and the bottom buttons in crochet mode.
