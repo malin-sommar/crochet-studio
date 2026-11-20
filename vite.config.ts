@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { playwright } from '@vitest/browser-playwright';
 
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { version: string };
 
@@ -37,7 +38,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
+        // .mjs is the PDF reader's worker, so PDF import works offline too.
+        globPatterns: ['**/*.{js,mjs,css,html,svg,png,webmanifest}'],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         cleanupOutdatedCaches: true,
       },
     }),
@@ -45,8 +48,30 @@ export default defineConfig({
   server: { port: 5173, strictPort: true },
   preview: { port: 4173, strictPort: true },
   test: {
-    environment: 'node',
-    include: ['tests/unit/**/*.test.ts'],
-    setupFiles: ['tests/unit/setup.ts'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          environment: 'node',
+          include: ['tests/unit/**/*.test.ts'],
+          setupFiles: ['tests/unit/setup.ts'],
+        },
+      },
+      {
+        // Picture and PDF import need a real browser (image decoding, canvas, pdf.js).
+        extends: true,
+        test: {
+          name: 'browser',
+          include: ['tests/browser/**/*.test.ts'],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+    ],
   },
 });

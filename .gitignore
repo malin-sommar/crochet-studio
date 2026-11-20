@@ -5,3 +5,7 @@ test-results/
 playwright-report/
 *.log
 .DS_Store
+
+# Real patterns for local testing only (see tests/fixtures/private/README.md)
+tests/fixtures/private/*
+!tests/fixtures/private/README.md
