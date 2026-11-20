@@ -15,24 +15,6 @@ function ComingSoon({ phase, items, note }: { phase: number; items: ReactNode[];
   );
 }
 
-export function StitchesPage() {
-  return (
-    <Page
-      title="Stitches"
-      lead="Look up stitches with their US, UK and Swedish names, a picture of what they make, and steps to follow."
-    >
-      <ComingSoon
-        phase={3}
-        items={[
-          'About 15 stitches to start: the basics, increases and decreases, and textures like moss, shell and bobble.',
-          'Search, and filter by difficulty and type.',
-          '"Use in designer" adds a stitch to a scarf or blanket.',
-        ]}
-      />
-    </Page>
-  );
-}
-
 export function DesignerPage() {
   return (
     <Page title="Scarf & blanket maker" lead="Build a scarf or blanket from rows of stitches and colors, and see how it will look.">

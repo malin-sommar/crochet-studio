@@ -2,8 +2,9 @@ import { useEffect, type ComponentType } from 'react';
 import { BackupReminder, UpdateBanner } from './components/Banners';
 import { TabNav } from './components/TabNav';
 import { ChartsPage, isFocusRoute } from './pages/ChartsPage';
-import { DesignerPage, NotFoundPage, PortfolioPage, StitchesPage } from './pages/Placeholders';
+import { DesignerPage, NotFoundPage, PortfolioPage } from './pages/Placeholders';
 import { SettingsPage } from './pages/SettingsPage';
+import { StitchesPage } from './pages/StitchesPage';
 import { parseHash, startTab, tabHref, useHash, type TabId } from './router';
 import { readDevice, writeDevice } from './storage/device';
 

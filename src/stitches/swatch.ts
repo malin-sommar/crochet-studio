@@ -94,12 +94,13 @@ function glyph(kind: GlyphKind, len: number, wid: number, p: Palette): Shape[] {
   const hw = wid / 2;
   const sw = Math.max(1, wid * 0.06);
   const out: Shape[] = [];
+  // The top of a stitch seen from the front: two loops forming a "V".
   const topV = (y: number) => {
-    const rx = hw * 0.55;
-    const ry = Math.min(wid * 0.2, len * 0.22);
+    const rx = wid * 0.3;
+    const ry = Math.min(wid * 0.13, len * 0.16);
     out.push(
-      { t: 'ellipse', cx: f(-hw * 0.4), cy: f(y), rx: f(rx), ry: f(ry), rot: -28, fill: p.light, stroke: p.dark, sw },
-      { t: 'ellipse', cx: f(hw * 0.4), cy: f(y), rx: f(rx), ry: f(ry), rot: 28, fill: p.light, stroke: p.dark, sw },
+      { t: 'ellipse', cx: f(-wid * 0.17), cy: f(y), rx: f(rx), ry: f(ry), rot: 38, fill: p.light, stroke: p.dark, sw },
+      { t: 'ellipse', cx: f(wid * 0.17), cy: f(y), rx: f(rx), ry: f(ry), rot: -38, fill: p.light, stroke: p.dark, sw },
     );
   };
   const post = (bodyW: number, top: number) => {
@@ -119,7 +120,7 @@ function glyph(kind: GlyphKind, len: number, wid: number, p: Palette): Shape[] {
       { t: 'path', d: `M${f(-bodyW / 2)} ${f(y0)} L${f(bodyW / 2)} ${f(y1)}`, stroke: p.light, sw: sw * 1.2 },
     );
   };
-  const vY = -len + Math.min(wid * 0.2, len * 0.22) * 1.25;
+  const vY = -len + Math.min(wid * 0.24, len * 0.3);
 
   switch (kind) {
     case 'sl':
@@ -127,7 +128,7 @@ function glyph(kind: GlyphKind, len: number, wid: number, p: Palette): Shape[] {
       out.push({ t: 'path', d: `M${f(-hw * 0.5)} ${f(-len * 0.5)} L${f(hw * 0.5)} ${f(-len * 0.5)}`, stroke: p.light, sw });
       break;
     case 'sc':
-      post(wid * 0.72, -len * 0.82);
+      post(wid * 0.82, -len * 0.8);
       topV(vY);
       break;
     case 'hdc':
@@ -160,7 +161,7 @@ function glyph(kind: GlyphKind, len: number, wid: number, p: Palette): Shape[] {
       break;
     }
     case 'bobble': {
-      const r = Math.min(hw * 1.15, len * 0.62);
+      const r = Math.min(hw * 1.3, len * 0.72);
       out.push({ t: 'ellipse', cx: 0, cy: f(-len * 0.5), rx: f(r), ry: f(r), fill: p.base, stroke: p.dark, sw: sw * 1.2 });
       out.push({ t: 'ellipse', cx: f(-r * 0.3), cy: f(-len * 0.5 - r * 0.35), rx: f(r * 0.38), ry: f(r * 0.24), rot: -30, fill: p.light });
       break;
@@ -249,7 +250,9 @@ function drawRows(spec: Extract<SwatchSpec, { layout: 'rows' }>, color: string):
       const { base, top: topW } = itemWidths(it);
       const b0 = xb;
       const t0 = xt;
-      xb += base * UNIT;
+      // In a repeating row every group sits right under its own tops (a shell's base is the
+      // middle of the shell); only shaping rows (not filled) get wider or narrower.
+      xb += (row.fill ? topW : base) * UNIT;
       xt += topW * UNIT;
       if ('space' in it) continue;
       if ('gap' in it) {

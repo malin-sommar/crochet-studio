@@ -1,4 +1,8 @@
 import { namesFromTerm, type Stitch } from './model';
+import type { SwatchItem } from './swatch';
+
+/** n single crochets, each w units wide (narrower ones show the fabric pulling in). */
+const scs = (n: number, w = 1): SwatchItem[] => Array.from({ length: n }, () => ({ k: 'sc' as const, w }));
 
 /**
  * The stitch library. All descriptions and steps are written for this app; nothing is copied from
@@ -243,12 +247,13 @@ export const STITCHES: readonly Stitch[] = [
       layout: 'rows',
       width: 9,
       cycle: [
-        { items: [{ k: 'sc' }, { k: 'sc' }, { k: 'sc' }, { k: 'sc' }] },
-        { items: [{ k: 'sc' }, { fan: 'sc', n: 2, w: 2 }, { fan: 'sc', n: 2, w: 2 }, { k: 'sc' }] },
-        { items: Array.from({ length: 6 }, () => ({ k: 'sc' as const })) },
-        { items: [{ k: 'sc' }, { fan: 'sc', n: 2, w: 2 }, { k: 'sc' }, { k: 'sc' }, { fan: 'sc', n: 2, w: 2 }, { k: 'sc' }] },
+        { items: scs(6) },
+        { items: [...scs(3), { fan: 'sc', n: 2, w: 1.7 }, ...scs(2)] },
+        { items: scs(7, 0.96) },
+        { items: [...scs(3, 0.96), { fan: 'sc', n: 2, w: 1.7 }, ...scs(3, 0.96)] },
+        { items: scs(8, 0.94) },
       ],
-      count: 4,
+      count: 5,
     },
     keywords: ['increase', 'grow', 'wider', '2 in one'],
   },
@@ -272,12 +277,13 @@ export const STITCHES: readonly Stitch[] = [
       layout: 'rows',
       width: 9,
       cycle: [
-        { items: Array.from({ length: 8 }, () => ({ k: 'sc' as const })) },
-        { items: [{ k: 'sc' }, { join: 'sc', n: 2, w: 2 }, { k: 'sc' }, { k: 'sc' }, { join: 'sc', n: 2, w: 2 }, { k: 'sc' }] },
-        { items: Array.from({ length: 6 }, () => ({ k: 'sc' as const })) },
-        { items: [{ k: 'sc' }, { join: 'sc', n: 2, w: 2 }, { join: 'sc', n: 2, w: 2 }, { k: 'sc' }] },
+        { items: scs(8, 0.94) },
+        { items: [...scs(3, 0.94), { join: 'sc', n: 2, w: 1.8 }, ...scs(3, 0.94)] },
+        { items: scs(7, 0.96) },
+        { items: [...scs(2, 0.96), { join: 'sc', n: 2, w: 1.8 }, ...scs(3, 0.96)] },
+        { items: scs(6) },
       ],
-      count: 4,
+      count: 5,
     },
     keywords: ['decrease', 'dec', 'narrower', 'dc2tog'],
   },
@@ -304,9 +310,9 @@ export const STITCHES: readonly Stitch[] = [
       layout: 'rows',
       width: 9,
       cycle: [
-        { items: Array.from({ length: 8 }, () => ({ k: 'sc' as const })) },
-        { items: [{ k: 'sc' }, { join: 'sc', n: 2, w: 1.6 }, { k: 'sc' }, { k: 'sc' }, { join: 'sc', n: 2, w: 1.6 }, { k: 'sc' }] },
-        { items: Array.from({ length: 6 }, () => ({ k: 'sc' as const })) },
+        { items: scs(8, 0.94) },
+        { items: [...scs(3, 0.94), { join: 'sc', n: 2, w: 1.5 }, ...scs(3, 0.94)] },
+        { items: scs(7, 0.92) },
       ],
       count: 3,
     },
@@ -317,8 +323,8 @@ export const STITCHES: readonly Stitch[] = [
   {
     id: 'moss',
     names: {
-      us: { name: 'Moss stitch', abbr: 'moss' },
-      uk: { name: 'Moss stitch', abbr: 'moss' },
+      us: { name: 'Moss stitch' },
+      uk: { name: 'Moss stitch' },
       sv: { name: 'Mosstygn', checked: false },
     },
     type: 'texture',
@@ -393,8 +399,8 @@ export const STITCHES: readonly Stitch[] = [
   {
     id: 'shell',
     names: {
-      us: { name: 'Shell stitch', abbr: 'shell' },
-      uk: { name: 'Shell stitch', abbr: 'shell' },
+      us: { name: 'Shell stitch' },
+      uk: { name: 'Shell stitch' },
       sv: { name: 'Solfjäder', checked: false },
     },
     type: 'texture',
@@ -434,8 +440,8 @@ export const STITCHES: readonly Stitch[] = [
   {
     id: 'puff',
     names: {
-      us: { name: 'Puff stitch', abbr: 'puff' },
-      uk: { name: 'Puff stitch', abbr: 'puff' },
+      us: { name: 'Puff stitch' },
+      uk: { name: 'Puff stitch' },
       sv: { name: 'Puffmaska', checked: false },
     },
     type: 'texture',
@@ -482,8 +488,8 @@ export const STITCHES: readonly Stitch[] = [
   {
     id: 'bobble',
     names: {
-      us: { name: 'Bobble stitch', abbr: 'bobble' },
-      uk: { name: 'Bobble stitch', abbr: 'bobble' },
+      us: { name: 'Bobble stitch' },
+      uk: { name: 'Bobble stitch' },
       sv: { name: 'Knopp', checked: false },
     },
     type: 'texture',

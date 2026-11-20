@@ -1,0 +1,288 @@
+/* ---------- Stitch library ---------- */
+
+.terms-switch {
+  max-width: 420px;
+}
+
+.field.search input {
+  width: 100%;
+  font-size: 1.05rem;
+}
+
+/* One line of filter chips; on a narrow screen it scrolls sideways instead of wrapping. */
+.chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 -16px 8px;
+  padding: 2px 16px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chips > * {
+  flex: none;
+}
+
+.chips-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-right: 2px;
+}
+
+@media (min-width: 768px) {
+  .chips {
+    flex-wrap: wrap;
+    margin: 0 0 8px;
+    padding: 0;
+  }
+}
+
+.chip {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.list-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+
+.small {
+  font-size: 0.9rem;
+}
+
+.stitch-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 900px) {
+  .stitch-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.stitch-card {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.stitch-card:hover {
+  border-color: var(--accent);
+}
+
+.stitch-card-body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.stitch-name {
+  font-weight: 700;
+  font-size: 1.08rem;
+}
+
+.via {
+  color: var(--accent);
+}
+
+.stitch-thumb {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 72px;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+.stitch-thumb svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.stitch-thumb.small {
+  width: 56px;
+  height: 44px;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+}
+
+.card > .badges {
+  margin-bottom: 12px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge.notes {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.badge.unconfirmed {
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+}
+
+/* One stitch */
+
+.names {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+
+.names > div {
+  display: grid;
+  grid-template-columns: 5.5em 1fr;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.names dt {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.names dd {
+  margin: 0;
+}
+
+.names .own dd {
+  font-weight: 700;
+}
+
+.swatch-large {
+  display: block;
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+  max-height: 320px;
+  margin: 0 auto 12px;
+}
+
+.steps,
+.pattern-rows {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding-left: 1.4em;
+}
+
+.pattern-rows {
+  list-style: none;
+  padding-left: 0;
+}
+
+.abbr-key {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 4px 16px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-size: 0.92rem;
+}
+
+.abbr-key > div {
+  display: flex;
+  gap: 8px;
+}
+
+.abbr-key dt {
+  font-weight: 700;
+  min-width: 3em;
+}
+
+.abbr-key dd {
+  margin: 0;
+}
+
+.related {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.related-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--tap);
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+textarea.notes {
+  font: inherit;
+  line-height: 1.5;
+}
+
+/* Abbreviations */
+
+.term-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.term-list .card {
+  margin: 0;
+  padding: 14px 16px;
+}
+
+.term-list p {
+  margin: 0 0 4px;
+}
+
+.term-own {
+  font-size: 1.05rem;
+}

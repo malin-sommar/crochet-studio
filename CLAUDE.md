@@ -69,10 +69,20 @@ Source: `../tapestry-tracker/` (`tracker.html`, plus its README.md and CLAUDE.md
 - **Test PDFs:** the repository is public, so real (bought) patterns never go in it. Tests use a generated Stitch Fiddle look-alike. Real PDFs can go in `tests/fixtures/private/` (git-ignored), where `npm test` checks that their numbers are read.
 - **The tracker's "later" ideas** (carry hints, lone stitches, yarn per color) wait until after the port.
 
+### Phase 3 decisions (agreed 2026-11-20)
+- **First 16 stitches:** ch, sl st, sc, hdc, dc, tr · magic ring, front/back loop only · increase, sc2tog, invisible decrease · moss (linen), V-stitch, shell, puff, bobble. Next: popcorn, cluster, front/back post, crocodile, waffle, granny cluster.
+- **Text** is written fresh by Claude; the user corrects anything that doesn't match their own way of crocheting. Each stitch also has "My notes" (own words plus a favorite video link), saved and backed up.
+- **Abbreviations in instructions follow the terms setting** (US sc / UK dc / Swedish fm), with the English sentences unchanged and a key on each page.
+- **Videos:** a "Find a video" button opens a YouTube search, instead of fixed links that can go stale.
+- **Pictures:** drawn swatches now. Crochet chart symbols come later.
+- **"Use in designer"** comes with Phase 4. The stitch data already holds what the designer needs.
+- **Abbreviations list** (idea #6) is part of the Stitches tab.
+- **Swedish terms** not confirmed yet show a "please check" mark until the user confirms them.
+
 ## Phases
 1. ✅ App shell: tabs, routing, theme (light and dark), storage layer, export/import of everything. Also PWA install and offline, and GitHub Pages deploy.
 2. ✅ Port the tapestry and mosaic tracker with all features and tests. Import existing project files.
-3. Stitch library (start with about 15 stitches, then grow it).
+3. ✅ Stitch library (start with about 15 stitches, then grow it).
 4. Scarf and blanket maker: create mode, preview, crochet mode, yarn estimate.
 5. Portfolio with photos.
 6. Extras from the ideas list, one at a time.
@@ -118,6 +128,36 @@ Source: `../tapestry-tracker/` (`tracker.html`, plus its README.md and CLAUDE.md
   - The tracker's test list: 1:1 pixel art, scaled pixel art, chart screenshots with grid lines including JPEG, a Stitch Fiddle-style PDF with row numbers split between both sides, and 40 random mosaic round trips.
   - Plus: old tracker files, chart codes, editing, rows, PDF export, a 20-file JPEG sweep, and end-to-end paint/undo, crochet progress across reloads, tracker files, paste, downloads, Trash, picture and PDF import, and backups that carry charts.
 
+### Phase 3: stitch library (2026-11-20)
+- **Pages** (`src/stitches/ui/`, routed from `src/pages/StitchesPage.tsx`):
+  - `#/stitches` is the list: a "Names in US / UK / Swedish" switch (the same setting as in Settings), search, filter chips for type and difficulty, and cards with a swatch, names in all three systems, badges and a "My notes" mark. A search that matched another system's name says so ("Found by the UK name: Double crochet").
+  - `#/stitches/<id>` is one stitch:
+    - names in US, UK and Swedish, difficulty, type and what it's used for
+    - a large swatch in a choice of 5 yarn colors (remembered per device)
+    - numbered steps, with a key of the abbreviations used in your terms
+    - the pattern: starting chain ("Chain a multiple of 6, plus 2"), numbered rows and which rows repeat
+    - tips, related stitches, "Find a video" (YouTube search in your terms) and My notes
+  - `#/stitches/terms` lists abbreviations in US ↔ UK ↔ Swedish, with search.
+- **Logic** (`src/stitches/`):
+  - `terms.ts`: the US/UK/Swedish words and `renderTerms`, which turns `{sc}`-style tokens into the chosen terms and capitalises sentences.
+  - `data.ts`: the 16 stitches.
+  - `model.ts`: the stitch and pattern types, starting-chain text, the `chainFits` check and row numbering.
+  - `search.ts`: search across all three systems and keywords, accents ignored, your own terms ranked first.
+  - `swatch.ts`: the swatch drawer.
+  - `notes.ts`: My notes.
+- **Data for the designer:** each fabric-making stitch has `pattern.multiple` and `pattern.plus` (the chain rule), the setup and repeat rows, `rowHeight` (compared with sc) and `yarn` (rough use per stitch width, compared with sc). Both numbers are estimates to be tuned against real swatches in Phase 4.
+- **Swatch drawer:** pure geometry, returning a list of shapes (ellipses, paths, rotated groups) that `SwatchView` paints as SVG. Phase 4 can paint the same shapes on a canvas.
+  - A swatch is rows of items: stitches, fans (inc, V, shell), joins (decreases), chain arcs and spaces.
+  - Every stitch is drawn as a post from its base to its top, so fans spread and decreases lean in.
+  - Repeating rows keep each group over its own base.
+- **Saving:** database version 2 adds the `stitchNotes` store (record id = stitch id), included in backups. It has an upgrade fixture and test, and old backups still import. Backup format is still 1.
+- **Tests:** 302 Vitest tests and 60 Playwright tests in total. New for Phase 3:
+  - Unit tests check that every stitch has complete names, text and links, and that every `{token}` is a known term.
+  - Every swatch must draw without NaN, a fan must spread from one point, and drawings must be deterministic.
+  - Also covered: chain rules, rendering in all three systems, search (Swedish, accents, "double crochet" in both systems, filters), notes and backups.
+  - 18 Playwright tests cover the list, search, filters, UK terms everywhere, the stitch page, notes across reloads and the abbreviations list.
+- **Shared styles** (form fields, hints, back link, color buttons) moved from `charts.css` into `styles.css`.
+
 ### Changes to the plan
 - PWA install and offline use moved from "more ideas" into Phase 1, since the phone is a main device.
 - Sharing a backup straight to Drive with the Android share sheet isn't possible: Chrome won't share `.json` files. The backup is a normal download instead.
@@ -127,6 +167,8 @@ Source: `../tapestry-tracker/` (`tracker.html`, plus its README.md and CLAUDE.md
   - pdf.js joins closely spaced column numbers ("9 10 11 12") into one piece of text; these are now split again.
 - Settings → Import now opens a tracker project file as a new chart instead of refusing it.
 - The first backup reminder waits until there's work at least 2 days old, so it doesn't appear right after the first chart.
+- Phase 3: the Stitches tab gained a "type" the plan didn't name, Technique (magic ring, front/back loop only), next to Basic, Increase & decrease and Texture.
+- "Update now" saves pending changes first and reloads by itself if the normal hand-over doesn't (fixed after Phase 2 went live).
 
 ## Working agreements for Claude
 - Read this file and `../tapestry-tracker/CLAUDE.md` before changing anything.
@@ -148,3 +190,8 @@ Source: `../tapestry-tracker/` (`tracker.html`, plus its README.md and CLAUDE.md
 - PDF import is only tested against a generated look-alike of a Stitch Fiddle PDF. A real one (in `tests/fixtures/private/`) would confirm it, since real PDFs may space or rotate their numbers differently.
 - Two very similar colors (for example navy and dark green) in a JPEG can merge when the number of colors is Automatic. Choosing the number fixes it. Is that good enough, or should Automatic be smarter?
 - Not yet tried on a real Android phone: painting with a finger, keep-screen-on, install, and the bottom buttons in crochet mode.
+- Swedish terms marked "please check" in the app (`checked: false` in `src/stitches/terms.ts` and `data.ts`):
+  - stitches: mosstygn, V-maska, solfjäder, puffmaska, knopp, 2 fm tillsammans, osynlig minskning
+  - other words: båge, luftmaskbåge, tillsammans, virkfasthet, "klipp av och fäst tråden", reliefstolpe framifrån/bakifrån, kluster
+- The step text for the 16 stitches needs a read-through by someone who crochets, to match "in my own words".
+- Swatch drawings are stylized. Shell is the least faithful (airier than real shell fabric).

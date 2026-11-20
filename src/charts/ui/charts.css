@@ -1,19 +1,5 @@
 /* ---------- Chart pages ---------- */
 
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--tap);
-  margin: -8px 0 4px;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.hint {
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-
 .mode-switch {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -54,58 +40,6 @@
 
 .toolbar > .btn {
   margin-bottom: 12px;
-}
-
-/* ---------- Fields ---------- */
-
-.fields {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 12px;
-}
-
-.field {
-  display: grid;
-  gap: 6px;
-  margin-bottom: 12px;
-  font-weight: 600;
-}
-
-.field input,
-.field select,
-.palette input[type='text'],
-textarea.code {
-  min-height: var(--tap);
-  padding: 0 12px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--ink);
-  font: inherit;
-  font-weight: 400;
-}
-
-textarea.code {
-  width: 100%;
-  padding: 10px 12px;
-  font: 0.85rem/1.4 ui-monospace, monospace;
-  resize: vertical;
-}
-
-.check {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: var(--tap);
-  margin-bottom: 8px;
-  cursor: pointer;
-}
-
-.check input {
-  width: 22px;
-  height: 22px;
-  flex: none;
-  accent-color: var(--accent);
 }
 
 .zoom {
@@ -162,42 +96,6 @@ textarea.code {
 }
 
 /* ---------- Colors ---------- */
-
-.color-picker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.swatch-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-width: var(--tap);
-  min-height: var(--tap);
-  padding: 0 10px 0 6px;
-  border: 2px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-  color: var(--ink);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.swatch-btn[aria-checked='true'],
-.swatch-btn[aria-pressed='true'] {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-soft);
-}
-
-.swatch {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  border: 1px solid rgb(0 0 0 / 0.2);
-}
 
 .palette {
   display: grid;
