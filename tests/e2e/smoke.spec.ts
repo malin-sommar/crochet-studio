@@ -122,12 +122,12 @@ test('a backup saved on one device can be imported on another', async ({ page, b
 });
 
 test('a file that is not a backup is refused with a clear message', async ({ page }, testInfo) => {
-  const file = testInfo.outputPath('heart.json');
+  const file = testInfo.outputPath('other.json');
   const { writeFileSync } = await import('node:fs');
-  writeFileSync(file, JSON.stringify({ app: 'tapestry-chart-tracker', version: 2, project: {} }));
+  writeFileSync(file, JSON.stringify({ app: 'some-other-app', data: [] }));
   await page.goto('/#/settings');
   await page.getByTestId('import-file').setInputFiles(file);
-  await expect(page.getByRole('alert')).toContainText('Tapestry Chart Tracker');
+  await expect(page.getByRole('alert')).toContainText("isn't a Crochet Studio backup");
 });
 
 test('the app can be installed (it has a manifest with icons)', async ({ page, request }) => {

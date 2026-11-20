@@ -2,7 +2,11 @@
 
 A personal web app for crocheting: tapestry and mosaic charts, a stitch library, a scarf and blanket maker, and a portfolio. It works on a computer and on an Android phone, offline, and can be installed like an app.
 
-**Status:** Phase 1 (app shell, storage and backups) is done. The tabs show what's coming in each phase. See [CLAUDE.md](CLAUDE.md) for the full plan.
+**Status:** Phase 1 (app shell, storage and backups) and Phase 2 (tapestry and mosaic charts, ported from the Tapestry Chart Tracker) are done. The other tabs show what's coming. See [CLAUDE.md](CLAUDE.md) for the full plan.
+
+## Moving charts from the Tapestry Chart Tracker
+
+In the tracker, open each chart and use **Download project file**. Then, in Crochet Studio, go to **Charts → Open project file** (or **Settings → Import a backup**) and pick the file. Each file becomes a chart here with its colors, mosaic settings and crochet progress.
 
 ## Use it
 
@@ -32,13 +36,15 @@ Then open http://localhost:5173.
 ## Tests
 
 ```
-npm test              # unit tests (Vitest): storage, backups, migrations, routing
-npm run test:e2e      # browser tests (Playwright) on a desktop and a 390 px phone screen
+npm test              # Vitest: logic in Node, plus picture and PDF import in a real Chromium
+npm run test:e2e      # Playwright: the whole app on a desktop and a 390 px phone screen
 npm run check         # TypeScript type check
 npm run test:all      # all of the above
 ```
 
 The first time, download the test browser with `npx playwright install chromium`.
+
+Real chart PDFs (for example bought patterns) must never be committed. To test with them anyway, put them in `tests/fixtures/private/`: git ignores that folder, and `npm test` checks that their row and column numbers are read.
 
 ## Publishing
 
@@ -56,6 +62,16 @@ src/
   pwa.ts               offline copy, updates, install button
   pages/               one file per tab, plus Settings
   components/          tab bar, page frame, buttons, banners, icons
+  charts/              tapestry and mosaic charts
+    model.ts           what a chart is; tracker files and chart codes
+    edit.ts            drawing, resize, border, mirror, flip, colors, progress
+    rows.ts, mosaic.ts row instructions; mosaic stitches and rule check
+    importImage.ts     finding the grid in a picture and grouping colors
+    pdfLabels.ts       reading the grid from a PDF's row and column numbers
+    importPdf.ts       pdf.js (loaded only for PDFs)
+    pdfExport.ts       the chart as a PDF (pdf-lib, loaded only when used)
+    store.ts, view.ts  saving charts; per-device zoom and tool
+    ui/                chart list, editor, crochet mode, import
   storage/
     db.ts              the database and its version history
     records.ts         fields every saved item has (id, createdAt, updatedAt, deletedAt)
@@ -65,8 +81,10 @@ src/
     backup.ts          backup file format, reading, merging and importing
     persist.ts         asking the browser to protect saved data
 tests/
-  unit/                Vitest
+  unit/                Vitest in Node
+  browser/             Vitest in Chromium (picture decoding, pdf.js)
   e2e/                 Playwright
-  fixtures/            saved data from every database version and backup format
+  support/             generated test pictures and PDFs
+  fixtures/            saved data from every database version and backup format, tracker files
 public/                app icons (PNGs are made from the SVGs with `npm run icons`)
 ```
