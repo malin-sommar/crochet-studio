@@ -1,0 +1,36 @@
+{
+ "app": "tapestry-chart-tracker",
+ "version": 2,
+ "project": {
+  "name": "Mosaic diamonds",
+  "w": 9,
+  "h": 7,
+  "cells": [
+   "000000000",
+   "111101111",
+   "000111000",
+   "110000011",
+   "000111000",
+   "111101111",
+   "000000000"
+  ],
+  "pal": [
+   {
+    "name": "Cream",
+    "hex": "#f3ead8"
+   },
+   {
+    "name": "Navy",
+    "hex": "#2b2d3d"
+   }
+  ],
+  "active": 1,
+  "cur": 1,
+  "done": [],
+  "example": false,
+  "tech": "mosaic",
+  "rev": true,
+  "mfirst": 1,
+  "updated": 1763460000000
+ }
+}
