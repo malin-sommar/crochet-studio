@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#faf6ef" />
+    <meta name="description" content="Charts, stitches, scarf and blanket designs and a portfolio for crocheting." />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <title>Crochet Studio</title>
+    <script>
+      // Apply the saved theme before the page is drawn, so it doesn't flash light then dark.
+      // Keep in step with src/theme.ts.
+      (function () {
+        var c = 'system';
+        try { c = localStorage.getItem('cs-theme') || 'system'; } catch (e) {}
+        var dark = c === 'dark' || (c !== 'light' && !!window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute('content', dark ? '#1b1719' : '#faf6ef');
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>Crochet Studio needs JavaScript to run.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -47,36 +47,64 @@ Source: `../tapestry-tracker/` (`tracker.html`, plus its README.md and CLAUDE.md
 5. **Contrast checker:** shows any palette in grayscale, so colors that blend together are obvious before buying yarn.
 6. **Abbreviations and terms:** US ↔ UK ↔ Swedish, quick to search.
 7. **Pattern library:** save bought PDFs and links with notes and my progress in them.
-8. **Backups:** export and import of everything as one file (JSON plus images in a zip).
-9. **Phone install:** works as an installable app (PWA) and offline.
+8. **Backups:** export and import of everything as one file (JSON plus images in a zip). *The JSON backup is done (Phase 1); the zip with images comes with portfolio photos in Phase 5.*
+9. **Phone install:** works as an installable app (PWA) and offline. *Basic install and offline use are done (Phase 1).*
 10. **Later:** sync between devices (needs a backend: Azure Static Web Apps with an API, or Supabase).
 
-## Tech direction (proposal; confirm before building)
-- Vite + React + TypeScript, client-side only at first. A PWA for install and offline use.
-- Storage: IndexedDB (for example through Dexie) for projects, stash and portfolio photos. Every store gets export and import.
-- Drawing: canvas for charts and fabric previews; SVG for stitch diagrams.
-- Libraries: pdf.js (PDF import) and pdf-lib (PDF export), as in the tracker.
-- Tests: Vitest for the logic modules; Playwright for a smoke test of each tab, at desktop and phone width.
-- Hosting: start with local `npm run dev`; later a static host (GitHub Pages or Azure Static Web Apps).
-- The old tracker's account sync used claude.ai artifact features, which won't exist in this app. Local storage plus export/import replaces it until a real sync backend exists.
+## Decisions (agreed 2026-11-20)
+- **Who and where:** one user, on a Windows PC and an Android phone (Chrome). No iPhone support needed. The code is public on GitHub.
+- **Stack:** Vite + React + TypeScript, client-side only. Dexie over IndexedDB for storage. Plain CSS with color variables, no UI framework. Routing is the URL hash (`#/charts`) with no router library.
+- **PWA:** vite-plugin-pwa (build-time only), in Phase 1. Updates wait for a tap on "Update now" so the app never reloads mid-row.
+- **Hosting:** GitHub Pages, deployed by GitHub Actions on every push to `main` after the tests pass. Address: https://malin-sommar.github.io/crochet-studio/. Use that address on both devices; `localhost` is for development and has its own separate data.
+- **Sync:** not now. Backup export and import is enough. Moving between devices = save a backup, put it on Google Drive (or email it), import it on the other device. Every record has `id`, `updatedAt` and `deletedAt`, so a real sync can be added later without a migration.
+- **Language:** English UI. Stitch names are shown in US terms first, with a setting to switch to UK or Swedish. The other names are shown next to them, and Swedish terms are in the library for looking up.
+- **Tests:** Vitest (with fake-indexeddb) for logic. Playwright with Chromium only, at desktop size and a 390 px Android phone (no WebKit, since there's no iPhone).
+- **Drawing and PDFs (unchanged):** canvas for charts and fabric previews; SVG for stitch diagrams. pdf.js and pdf-lib, from npm and loaded only when needed.
 
 ## Phases
-1. App shell: tabs, routing, theme (light and dark), storage layer, export/import of everything.
+1. ✅ App shell: tabs, routing, theme (light and dark), storage layer, export/import of everything. Also PWA install and offline, and GitHub Pages deploy.
 2. Port the tapestry and mosaic tracker with all features and tests. Import existing project files.
 3. Stitch library (start with about 15 stitches, then grow it).
 4. Scarf and blanket maker: create mode, preview, crochet mode, yarn estimate.
 5. Portfolio with photos.
 6. Extras from the ideas list, one at a time.
 
+## What's built
+
+### Phase 1: app shell (2026-11-20)
+- **Tabs:** Charts, Stitches, Designer, Portfolio and Settings. There's a bottom tab bar on a phone and a side bar from 768 px. Placeholder pages say what each phase brings. An empty address opens the last main tab used on this device; an unknown address shows "Page not found".
+- **Theme:** Automatic (follows the device), Light or Dark, chosen per device (localStorage `cs-theme`). An inline script in `index.html` applies it before the first paint. Colors are CSS variables in `src/styles.css`; dark values are under `[data-theme='dark']`.
+- **Storage** (`src/storage/`):
+  - IndexedDB database `crochet-studio` with the stores `settings` (one `prefs` record: stitch terms), `charts`, `designs` and `portfolio`. The content stores are empty until their phases define a record shape.
+  - Every record has `id` (UUID), `createdAt`, `updatedAt` (always moves forward, even if the clock goes back) and `deletedAt` (set when trashed). Helpers live in `content.ts`: create, update, move to Trash, restore, delete for good (Trash only), empty the Trash, count.
+  - Per-device conveniences are kept in localStorage with a `cs-` prefix and are not backed up: theme, last tab, last backup date.
+  - The app asks the browser for persistent storage at start-up and after install. Settings shows the status and the space used.
+- **Backups** (`backup.ts`): `{app:"crochet-studio", format:1, exportedAt, appVersion, stores:{settings, charts, designs, portfolio}}`, including trashed items.
+  - Import reads and checks the file, shows a preview (new / updated / unchanged per store), then merges in one transaction. The newest `updatedAt` wins, and import never deletes anything.
+  - It refuses, with a plain message: files that aren't backups, tracker project files, newer formats, and stores it doesn't know (so data is never silently dropped).
+  - A banner reminds you to back up when there's work on the device and no backup in 14 days.
+- **Settings page:** theme, terms, backup and import (with "how to move to another device"), storage protection and an Install button, Trash (restore / delete for good / empty, with confirmation), and the app version.
+- **Tests:** 61 unit tests (storage, Trash, merge rules, backup round trip, moving back and forth between two devices, damaged files, a test that every database version upgrades, a test that every backup format still imports, routing, theme, dates). 20 Playwright tests: each tab at desktop and phone size, no sideways scrolling, tap-target size, theme and terms saved across reloads, backup saved on one browser and imported in a fresh one, a tracker file refused, the install manifest.
+- **Not covered by browser tests yet:** the Trash and the backup reminder in the UI (nothing can create content until Phase 2; their logic is unit-tested), and the service worker (blocked in tests to avoid stale caches).
+
+### Changes to the plan
+- PWA install and offline use moved from "more ideas" into Phase 1, since the phone is a main device.
+- Sharing a backup straight to Drive with the Android share sheet isn't possible: Chrome won't share `.json` files. The backup is a normal download instead.
+
 ## Working agreements for Claude
 - Read this file and `../tapestry-tracker/CLAUDE.md` before changing anything.
-- Never lose user data: migrations must keep old saved data readable, and any change to the storage format needs a migration and a test.
-- Keep the UI usable at phone width (about 390 px).
+- Never lose user data: migrations must keep old saved data readable, and any change to the storage format needs a migration and a test. Concretely:
+  - **Database:** `SCHEMA_HISTORY` in `src/storage/db.ts` is append-only. A new version gets an `upgrade` when records change shape, plus an entry in `tests/fixtures/db-fixtures.ts` (the upgrade test fails without one). Adding a store or an index needs a new version but no data migration.
+  - **Backup format:** when existing records change shape, raise `BACKUP_FORMAT`, add a migration in `backup.ts` and add `tests/fixtures/backup-format-<n>.json`. Never edit an old fixture. A new store doesn't need a format change, but add it to `BACKUP_STORES`.
+  - New content stores go into `CONTENT_STORES` (to get the Trash, backup and counting) and `STORE_LABELS`.
+  - Deleting means moving to the Trash. Only the Trash's "delete for good" removes data.
+- Keep the UI usable at phone width (about 390 px). Tap targets are at least 48 px (`--tap`).
 - Ask before adding a large dependency or changing the tech stack.
 - Stitch descriptions and pictures are original. Don't copy text or images from tutorial sites or paid patterns, and never bake a purchased pattern into the app's code or sample data.
+- Run `npm run test:all` before committing. CI runs the same checks and blocks the deploy if they fail.
 - After each phase, update this file: what was built, what changed in the plan, open questions.
 
 ## Open questions
-- App name (working title: Crochet Studio).
-- US or UK terms as the default (show both?).
-- Is device sync needed early, or is export/import enough for now?
+- App name: "Crochet Studio" for now. It appears in `vite.config.ts` (manifest), `index.html` and the brand in `TabNav.tsx`.
+- Phase 2: the existing tracker projects live inside the claude.ai artifact (its localStorage and account database), which this app can't read. Should the tracker get an "Export all projects" button, so moving them is one file instead of one file per chart?
+- Phase 2: what should a chart record look like in the `charts` store? Proposal: the tracker's project fields (`name, w, h, cells, pal, active, cur, done, tech, rev, mfirst`) plus the shared record fields, with the tracker's `normalize` rules for reading old files.

@@ -1,0 +1,19 @@
+{
+ "app": "crochet-studio",
+ "format": 1,
+ "exportedAt": "2026-11-20T12:00:00.000Z",
+ "appVersion": "0.1.0",
+ "stores": {
+  "settings": [
+   {
+    "id": "prefs",
+    "createdAt": 1763640000000,
+    "updatedAt": 1763640000000,
+    "terms": "uk"
+   }
+  ],
+  "charts": [],
+  "designs": [],
+  "portfolio": []
+ }
+}
