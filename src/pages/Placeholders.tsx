@@ -15,21 +15,6 @@ function ComingSoon({ phase, items, note }: { phase: number; items: ReactNode[];
   );
 }
 
-export function ChartsPage() {
-  return (
-    <Page title="Charts" lead="Draw or import tapestry and mosaic charts, then follow them row by row.">
-      <ComingSoon
-        phase={2}
-        items={[
-          'Everything from the Tapestry Chart Tracker: drawing with up to 8 colors, importing from a picture or a PDF, mosaic mode, crochet mode and PDF export.',
-          'Project files (.json) saved from the tracker open here unchanged.',
-        ]}
-        note="Until then, keep using the tracker. Before switching, save each chart there as a project file."
-      />
-    </Page>
-  );
-}
-
 export function StitchesPage() {
   return (
     <Page

@@ -116,3 +116,19 @@ export async function countItems(): Promise<number> {
   for (const store of CONTENT_STORES) n += await db.store(store).filter((r) => !r.deletedAt).count();
   return n;
 }
+
+/** How many items there are (not in the Trash), and when the oldest one was made. */
+export async function contentSummary(): Promise<{ count: number; oldestCreatedAt: number | null }> {
+  let count = 0;
+  let oldest: number | null = null;
+  for (const store of CONTENT_STORES) {
+    await db
+      .store(store)
+      .filter((r) => !r.deletedAt)
+      .each((r) => {
+        count++;
+        if (oldest === null || r.createdAt < oldest) oldest = r.createdAt;
+      });
+  }
+  return { count, oldestCreatedAt: oldest };
+}

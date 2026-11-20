@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { lastBackupAt, saveBackupFile } from '../backupActions';
+import { ChartFileError, isProjectFile, readProjectFile } from '../charts/model';
+import { createChart } from '../charts/store';
+import { tabHref } from '../router';
 import { Card, Page } from '../components/Page';
 import { Segmented } from '../components/Segmented';
 import { formatAgo, formatDate, formatDateTime } from '../lib/format';
@@ -70,7 +73,16 @@ type ImportState =
   | { step: 'preview'; fileName: string; file: BackupFile; preview: ImportResult }
   | { step: 'importing' }
   | { step: 'done'; result: ImportResult }
+  | { step: 'chart'; id: string; name: string }
   | { step: 'error'; message: string };
+
+function looksLikeProjectFile(text: string): boolean {
+  try {
+    return isProjectFile(JSON.parse(text));
+  } catch {
+    return false;
+  }
+}
 
 function countsText(c: MergeCounts): string {
   const parts: string[] = [];
@@ -102,7 +114,14 @@ function BackupCard() {
     if (!f) return;
     setState({ step: 'reading' });
     try {
-      const file = readBackup(await f.text());
+      const text = await f.text();
+      if (looksLikeProjectFile(text)) {
+        // A single chart from the Tapestry Chart Tracker (or saved here): open it as a new chart.
+        const chart = await createChart(readProjectFile(text, f.name));
+        setState({ step: 'chart', id: chart.id, name: chart.name });
+        return;
+      }
+      const file = readBackup(text);
       setState({ step: 'preview', fileName: f.name, file, preview: await previewImport(file) });
     } catch (err) {
       setState({ step: 'error', message: errorText(err) });
@@ -163,6 +182,21 @@ function BackupCard() {
           onImport={() => void onImport(state.file)}
           onCancel={() => setState({ step: 'idle' })}
         />
+      )}
+      {state.step === 'chart' && (
+        <div className="note ok" role="status">
+          <p>
+            That was a chart project file, so it opened as a new chart: “{state.name}”.
+          </p>
+          <div className="actions">
+            <a className="btn" href={tabHref('charts', state.id)}>
+              Open the chart
+            </a>
+            <button type="button" className="btn" onClick={() => setState({ step: 'idle' })}>
+              OK
+            </button>
+          </div>
+        </div>
       )}
       {state.step === 'done' && (
         <div className="note ok" role="status">
@@ -251,7 +285,7 @@ function ImportPreview({
 }
 
 function errorText(err: unknown): string {
-  if (err instanceof BackupError) return err.message;
+  if (err instanceof BackupError || err instanceof ChartFileError) return err.message;
   return `Something went wrong: ${err instanceof Error ? err.message : String(err)}. Nothing was changed.`;
 }
 

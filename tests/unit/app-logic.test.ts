@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+import { backupIsDue } from '../../src/backupActions';
 import { daysBetween, formatAgo } from '../../src/lib/format';
 import { parseHash, startTab, tabHref } from '../../src/router';
 import { parseThemeChoice, resolveTheme } from '../../src/theme';
@@ -52,6 +53,25 @@ describe('theme', () => {
     expect(parseThemeChoice(null)).toBe('system');
     expect(parseThemeChoice('purple')).toBe('system');
     expect(parseThemeChoice('dark')).toBe('dark');
+  });
+});
+
+describe('backup reminder', () => {
+  const day = 24 * 60 * 60 * 1000;
+  const now = new Date(2026, 10, 20, 12).getTime();
+
+  test('nothing to back up, no reminder', () => {
+    expect(backupIsDue({ count: 0, oldestCreatedAt: null }, null, now)).toBe(false);
+  });
+
+  test('never backed up: waits until the work is 2 days old', () => {
+    expect(backupIsDue({ count: 1, oldestCreatedAt: now - day }, null, now)).toBe(false);
+    expect(backupIsDue({ count: 1, oldestCreatedAt: now - 2 * day }, null, now)).toBe(true);
+  });
+
+  test('backed up before: reminds after 14 days', () => {
+    expect(backupIsDue({ count: 3, oldestCreatedAt: 0 }, now - 13 * day, now)).toBe(false);
+    expect(backupIsDue({ count: 3, oldestCreatedAt: 0 }, now - 14 * day, now)).toBe(true);
   });
 });
 
