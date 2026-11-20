@@ -1,15 +1,18 @@
 import { ChartList } from '../charts/ui/ChartList';
 import { ChartScreen } from '../charts/ui/ChartScreen';
+import { ImportPage } from '../charts/ui/ImportPage';
 import '../charts/ui/charts.css';
 
 /**
  * #/charts              the list
+ * #/charts/import       import a picture or PDF
  * #/charts/<id>         one chart, edit mode
  * #/charts/<id>/crochet one chart, crochet mode
  */
 export function ChartsPage({ rest }: { rest: string[] }) {
   const [id, mode] = rest;
   if (!id) return <ChartList />;
+  if (id === 'import') return <ImportPage />;
   return <ChartScreen key={id} id={id} mode={mode === 'crochet' ? 'crochet' : 'edit'} />;
 }
 

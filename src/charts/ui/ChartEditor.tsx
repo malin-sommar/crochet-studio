@@ -265,6 +265,24 @@ function ChartActions({ s }: { s: ReadySession }) {
         <button
           type="button"
           className="btn"
+          onClick={async () => {
+            setMsg('Making the PDF…');
+            try {
+              const { buildChartPdf } = await import('../pdfExport');
+              const bytes = await buildChartPdf(chart);
+              downloadFile(`${fileBaseName(chart.name)}.pdf`, bytes as Uint8Array<ArrayBuffer>, 'application/pdf');
+              setMsg('PDF saved to your downloads.');
+            } catch (e) {
+              console.error(e);
+              setMsg(`The PDF couldn't be made (${e instanceof Error ? e.message : String(e)}).`);
+            }
+          }}
+        >
+          Download PDF
+        </button>
+        <button
+          type="button"
+          className="btn"
           onClick={() => {
             downloadFile(`${fileBaseName(chart.name)}.json`, projectFileText(chart), 'application/json');
             setMsg('Project file saved to your downloads.');
