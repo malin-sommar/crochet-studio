@@ -1,6 +1,6 @@
 import { useId, useMemo, useState, type ReactNode } from 'react';
 import { readDevice, writeDevice } from '../../storage/device';
-import { SWATCH_COLORS, drawSwatch, type Shape, type SwatchSpec } from '../swatch';
+import { SWATCH_COLORS, drawSwatch, type Shape, type Swatch, type SwatchSpec } from '../swatch';
 
 function paint(s: Shape, key: number): ReactNode {
   switch (s.t) {
@@ -42,6 +42,11 @@ function paint(s: Shape, key: number): ReactNode {
 /** A drawn swatch of a stitch, in a yarn color. */
 export function SwatchView({ spec, color, label, className }: { spec: SwatchSpec; color: string; label: string; className?: string }) {
   const sw = useMemo(() => drawSwatch(spec, color), [spec, color]);
+  return <SwatchSvg swatch={sw} label={label} className={className} />;
+}
+
+/** Paints a drawn swatch (from drawSwatch or drawRowList) as SVG. */
+export function SwatchSvg({ swatch: sw, label, className }: { swatch: Swatch; label: string; className?: string }) {
   const clip = `sw${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   return (
     <svg viewBox={`0 0 ${sw.width} ${sw.height}`} role="img" aria-label={label} className={className}>

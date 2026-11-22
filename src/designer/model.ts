@@ -94,7 +94,7 @@ export function blankDesign(): DesignContent {
   };
 }
 
-/** A striped moss stitch scarf, to try the designer with. */
+/** A striped moss stitch scarf, about 19 × 150 cm, to try the designer with. */
 export function exampleDesign(): DesignContent {
   return {
     ...blankDesign(),
@@ -102,7 +102,7 @@ export function exampleDesign(): DesignContent {
     width: 30,
     blocks: [
       newBlock([newLine('sc', 0, 2)]),
-      newBlock([newLine('moss', 1, 2), newLine('moss', 2, 2), newLine('moss', 0, 2)], 22),
+      newBlock([newLine('moss', 1, 2), newLine('moss', 2, 2), newLine('moss', 0, 2)], 44),
       newBlock([newLine('sc', 0, 2)]),
     ],
   };
@@ -177,7 +177,7 @@ export function normalizeDesign(raw: unknown): DesignContent | null {
 }
 
 /** Removes a color; rows in that color become the first color, later colors move up. */
-export function removeDesignColor(d: DesignContent, index: number): DesignContent {
+export function removeDesignColor<T extends DesignContent>(d: T, index: number): T {
   if (d.colors.length <= 1) return d;
   return {
     ...d,

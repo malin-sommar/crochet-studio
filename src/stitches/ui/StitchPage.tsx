@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Card, Page } from '../../components/Page';
+import { UseInDesign } from '../../designer/ui/UseInDesign';
 import { onBeforeLeave } from '../../lib/pendingSaves';
 import type { Terms } from '../../storage/prefs';
 import { tabHref } from '../../router';
@@ -161,6 +162,7 @@ export function StitchPage({ id }: { id: string }) {
         </a>
       </Card>
 
+      <UseInDesign stitchId={s.id} />
       <NotesCard stitchId={s.id} />
     </Page>
   );

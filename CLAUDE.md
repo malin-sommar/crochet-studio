@@ -79,11 +79,17 @@ Source: `../tapestry-tracker/` (`tracker.html`, plus its README.md and CLAUDE.md
 - **Abbreviations list** (idea #6) is part of the Stitches tab.
 - **Swedish terms** not confirmed yet show a "please check" mark until the user confirms them.
 
+### Phase 4 decisions (agreed 2026-11-22)
+- **Mix stitches freely:** every row line has its own stitch. Textures start with a "first row" worked into the stitches below.
+- **Gauge:** one swatch (stitches and rows per 10 cm) in a chosen stitch, default sc. Other stitches' heights are estimated, so sizes say "about".
+- **Yarn:** weigh the 10 × 10 cm swatch for meters and balls per color (10% extra); until then a rough estimate. One yarn (meters and grams per ball) per design; different yarns per color can come with the yarn stash.
+- **Not in Phase 4:** borders and fringe, and a written-pattern PDF.
+
 ## Phases
 1. ✅ App shell: tabs, routing, theme (light and dark), storage layer, export/import of everything. Also PWA install and offline, and GitHub Pages deploy.
 2. ✅ Port the tapestry and mosaic tracker with all features and tests. Import existing project files.
 3. ✅ Stitch library (start with about 15 stitches, then grow it).
-4. Scarf and blanket maker: create mode, preview, crochet mode, yarn estimate.
+4. ✅ Scarf and blanket maker: create mode, preview, crochet mode, yarn estimate.
 5. Portfolio with photos.
 6. Extras from the ideas list, one at a time.
 
@@ -158,6 +164,33 @@ Source: `../tapestry-tracker/` (`tracker.html`, plus its README.md and CLAUDE.md
   - 18 Playwright tests cover the list, search, filters, UK terms everywhere, the stitch page, notes across reloads and the abbreviations list.
 - **Shared styles** (form fields, hints, back link, color buttons) moved from `charts.css` into `styles.css`.
 
+### Phase 4: scarf and blanket maker (2026-11-22)
+- **Pages** (`src/designer/ui/`, routed from `src/pages/DesignerPage.tsx`):
+  - `#/designer` lists designs with a small picture, size in cm, rows and progress, plus New design and Try an example (a striped moss scarf, about 19 × 150 cm).
+  - `#/designer/<id>` is edit mode:
+    - previews: the whole piece to scale, and a close-up of the selected block
+    - problems, with one-tap "Use N stitches" fixes
+    - Rows: blocks of row lines (rows, stitch, color, loop for plain stitches), repeat × N, move, delete, undo, and "row 1 is the right side"
+    - Width in stitches or cm, with the starting chain and which stitches fit
+    - Colors, Gauge and yarn (with a meters and balls table), and "This design" (rename, duplicate, delete to the Trash)
+  - `#/designer/<id>/crochet` is crochet mode, like the charts:
+    - the current row with its color, stitch, loop and side
+    - the instructions in your terms and the stitch count
+    - the special-stitch note, and "Next row is X: join it on the last yarn over of this row"
+    - a close-up of the rows so far, the whole piece with the row outlined, all rows, keep screen on, clear progress, and the big bottom buttons
+- **"Use in a design"** on stitch pages: start a new design with the stitch (at the nearest width that fits it), or add 10 rows of it to an existing design. Back / front loop only adds sc in the back loop.
+- **Logic** (`src/designer/`):
+  - `patterns.ts`: the countable pattern rows. Each fabric stitch (sl st, sc, hdc, dc, tr, moss, V-stitch, shell, puff, bobble) has a foundation row, a first row over other stitches, and cycle rows. Each row says how many places it makes and uses before, in and after its repeat; text is a function of the width.
+  - `plan.ts`: blocks → numbered rows. The stitch cycle continues across color changes and restarts when the stitch changes. Problems: width doesn't fit (with suggestions), bobbles on the back, empty, too long (3000 rows).
+  - `measure.ts`: size from gauge; meters per sc from a weighed swatch, or 7 × the stitch width as a rough rule.
+  - `model.ts`: the design type, the example and defensive reading. `store.ts`: saving designs.
+  - `src/lib/useRecordSession.ts`: a generic version of the chart's save-as-you-go session. Charts still use their own.
+- **Saving:** designs go in the existing `designs` store (with the Trash and backups). No database or backup format change.
+- **Tests:** 400 Vitest tests and 78 Playwright tests in total.
+  - Every row of every pattern makes and uses exactly the width, for every fitting width from 2 to 161. Foundation chains agree with the library's chain rules.
+  - Also covered: planning, problems, size and yarn math, defensive reading, backups.
+  - 18 Playwright tests cover the example, width fixes, editing with undo, yarn from a weighed swatch, crochet mode across reloads, UK terms, "Use in a design" both ways, and Trash.
+
 ### Changes to the plan
 - PWA install and offline use moved from "more ideas" into Phase 1, since the phone is a main device.
 - Sharing a backup straight to Drive with the Android share sheet isn't possible: Chrome won't share `.json` files. The backup is a normal download instead.
@@ -169,6 +202,8 @@ Source: `../tapestry-tracker/` (`tracker.html`, plus its README.md and CLAUDE.md
 - The first backup reminder waits until there's work at least 2 days old, so it doesn't appear right after the first chart.
 - Phase 3: the Stitches tab gained a "type" the plan didn't name, Technique (magic ring, front/back loop only), next to Basic, Increase & decrease and Texture.
 - "Update now" saves pending changes first and reloads by itself if the normal hand-over doesn't (fixed after Phase 2 went live).
+- Phase 4: the stitch library's blo-flo entry isn't a separate designer stitch. In the designer, back or front loop is a choice on any plain stitch.
+- Phase 4: V-stitch needs at least 8 stitches (two V's), so no row repeat is ever worked 0 times.
 
 ## Working agreements for Claude
 - Read this file and `../tapestry-tracker/CLAUDE.md` before changing anything.
@@ -195,3 +230,8 @@ Source: `../tapestry-tracker/` (`tracker.html`, plus its README.md and CLAUDE.md
   - other words: båge, luftmaskbåge, tillsammans, virkfasthet, "klipp av och fäst tråden", reliefstolpe framifrån/bakifrån, kluster
 - The step text for the 16 stitches needs a read-through by someone who crochets, to match "in my own words".
 - Swatch drawings are stylized. Shell is the least faithful (airier than real shell fabric).
+- Designer estimates to check against real swatches:
+  - the row heights and yarn use per stitch compared with sc (`rowHeight` and `yarn` in `src/stitches/data.ts`)
+  - the rough rule of 7 × the stitch width per sc
+  - the assumption that every stitch is as wide as one gauge stitch
+- The designer's first-row-over-stitches texts (moss, V-stitch, shell) are the app's own construction: they count correctly but haven't been crocheted yet.

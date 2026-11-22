@@ -215,14 +215,22 @@ function rowsOf(spec: Extract<SwatchSpec, { layout: 'rows' }>): SwatchRow[] {
 }
 
 function drawRows(spec: Extract<SwatchSpec, { layout: 'rows' }>, color: string): Swatch {
-  const rows = rowsOf(spec);
+  return drawRowList(
+    rowsOf(spec).map((row) => ({ row, color })),
+    spec.width,
+  );
+}
+
+/** Rows (bottom first), each in its own color, `widthUnits` stitches wide. */
+export function drawRowList(list: readonly { row: SwatchRow; color: string }[], widthUnits: number): Swatch {
+  const spec = { width: widthUnits };
   const W = spec.width * UNIT;
   const gapY = UNIT * 0.06;
-  const H = rows.reduce((s, r) => s + rowHeight(r) * UNIT * 0.92 + gapY, 0) + UNIT * 0.3;
+  const H = list.reduce((s, r) => s + rowHeight(r.row) * UNIT * 0.92 + gapY, 0) + UNIT * 0.3;
   const shapes: Shape[] = [];
   let bottom = H - UNIT * 0.15;
 
-  rows.forEach((row, ri) => {
+  list.forEach(({ row, color }, ri) => {
     const h = rowHeight(row) * UNIT * 0.92;
     const top = bottom - h;
     // Rows worked back and forth show the front and back of the stitches in turn

@@ -2,7 +2,13 @@
 
 A personal web app for crocheting: tapestry and mosaic charts, a stitch library, a scarf and blanket maker, and a portfolio. It works on a computer and on an Android phone, offline, and can be installed like an app.
 
-**Status:** Phases 1–3 are done: the app shell with storage and backups, tapestry and mosaic charts (ported from the Tapestry Chart Tracker), and the stitch library with 16 stitches in US, UK and Swedish terms. The Designer and Portfolio tabs show what's coming. See [CLAUDE.md](CLAUDE.md) for the full plan.
+**Status:** Phases 1–4 are done:
+- the app shell, with storage and backups
+- tapestry and mosaic charts, ported from the Tapestry Chart Tracker
+- the stitch library: 16 stitches in US, UK and Swedish terms
+- the scarf and blanket maker: rows of stitches and colors, size and yarn estimates, and a row-by-row crochet mode
+
+The Portfolio tab shows what's coming. See [CLAUDE.md](CLAUDE.md) for the full plan.
 
 ## Moving charts from the Tapestry Chart Tracker
 
@@ -80,6 +86,12 @@ src/
     swatch.ts          drawing a swatch as simple shapes
     notes.ts           your notes per stitch
     ui/                list, stitch page, abbreviations
+  designer/            the scarf and blanket maker
+    patterns.ts        each stitch's rows, written so stitch counts can be checked
+    plan.ts            blocks of rows → numbered rows with instructions and problems
+    measure.ts         size from the gauge, yarn per color
+    model.ts, store.ts the design type; saving designs
+    ui/                design list, editor with previews, crochet mode, "Use in a design"
   storage/
     db.ts              the database and its version history
     records.ts         fields every saved item has (id, createdAt, updatedAt, deletedAt)

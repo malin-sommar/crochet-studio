@@ -27,8 +27,8 @@ describe('planning rows', () => {
   const ex = exampleDesign();
   const plan = planDesign(ex);
 
-  test('the example scarf: 2 sc rows, 22 × 6 moss rows, 2 sc rows', () => {
-    expect(plan.rows).toHaveLength(2 + 22 * 6 + 2);
+  test('the example scarf: 2 sc rows, 44 × 6 moss rows, 2 sc rows', () => {
+    expect(plan.rows).toHaveLength(2 + 44 * 6 + 2);
     expect(plan.problems).toEqual([]);
     expect(plan.chain).toBe(31);
   });
@@ -49,7 +49,7 @@ describe('planning rows', () => {
     expect(t(3)).toBe(
       'Ch 2 (makes the first space), sc in the 2nd st, *ch 1, sk the next st, sc in the next st; rep from * across (14 times), turn.',
     );
-    expect(t(135)).toBe('Ch 1 (does not count as a stitch), sc in each st and ch-sp across (30 sts), turn.');
+    expect(t(267)).toBe('Ch 1 (does not count as a stitch), sc in each st and ch-sp across (30 sts), turn.');
   });
 
   test('shell rows alternate their two cycle rows', () => {
@@ -112,8 +112,8 @@ describe('size and yarn', () => {
   test('size in cm from the gauge', () => {
     const s = pieceSize(ex, plan);
     expect(s.widthCm).toBeCloseTo(18.75, 2);
-    // 136 rows as tall as sc rows (moss rows count as sc height), 18 rows per 10 cm
-    expect(s.heightCm).toBeCloseTo((136 * 10) / 18, 1);
+    // 268 rows as tall as sc rows (moss rows count as sc height), 18 rows per 10 cm
+    expect(s.heightCm).toBeCloseTo((268 * 10) / 18, 1);
   });
 
   test('taller stitches make taller rows', () => {
@@ -138,8 +138,8 @@ describe('size and yarn', () => {
     const weighed = { ...ex, yarn: { ...ex.yarn, swatchGrams: 10 } };
     const y = yarnEstimate(weighed, plan, plan.chain);
     const perSc = 20 / 288;
-    // color 1 (Mustard): 44 moss rows of 30 stitches, moss uses 0.85 of sc
-    expect(y.meters[1]).toBeCloseTo(44 * 30 * 0.85 * perSc, 3);
+    // color 1 (Mustard): 88 moss rows of 30 stitches, moss uses 0.85 of sc
+    expect(y.meters[1]).toBeCloseTo(88 * 30 * 0.85 * perSc, 3);
     expect(y.balls[1]).toBe(Math.ceil((y.meters[1]! * 1.1) / 200));
     expect(y.totalMeters).toBeCloseTo(y.meters.reduce((a, b) => a + b, 0), 6);
     expect(y.rough).toBe(false);

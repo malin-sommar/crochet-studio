@@ -15,22 +15,6 @@ function ComingSoon({ phase, items, note }: { phase: number; items: ReactNode[];
   );
 }
 
-export function DesignerPage() {
-  return (
-    <Page title="Scarf & blanket maker" lead="Build a scarf or blanket from rows of stitches and colors, and see how it will look.">
-      <ComingSoon
-        phase={4}
-        items={[
-          'Rows with a stitch, a color and a loop (both, front or back), and repeats like "rows 3–6 × 10".',
-          'A live picture of the piece, and its size from your gauge swatch.',
-          'Meters of yarn per color, and how many balls to buy.',
-          'A crochet mode that takes you through it row by row.',
-        ]}
-      />
-    </Page>
-  );
-}
-
 export function PortfolioPage() {
   return (
     <Page title="Portfolio" lead="Photos and notes for every project: planned, in progress, finished or frogged.">

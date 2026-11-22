@@ -16,7 +16,7 @@ export function ChartsPage({ rest }: { rest: string[] }) {
   return <ChartScreen key={id} id={id} mode={mode === 'crochet' ? 'crochet' : 'edit'} />;
 }
 
-/** Crochet mode takes the whole phone screen: no tab bar, no banners. */
+/** Crochet mode (charts and designs) takes the whole phone screen: no tab bar, no banners. */
 export function isFocusRoute(tab: string | null, rest: string[]): boolean {
-  return tab === 'charts' && rest.length >= 2 && rest[1] === 'crochet';
+  return (tab === 'charts' || tab === 'designer') && rest.length >= 2 && rest[1] === 'crochet';
 }

@@ -16,6 +16,8 @@ export interface PlannedRow {
   line: number;
   rep: number;
   kind: 'foundation' | 'first' | 'cycle';
+  /** For cycle rows, which of the pattern's cycle rows (from 0); -1 otherwise. */
+  cycleIndex: number;
   spec: RowSpec;
   /** Times the repeat is worked, or null if the width doesn't fit this stitch. */
   r: number | null;
@@ -68,6 +70,7 @@ export function planDesign(d: DesignContent): Plan {
           let kind: PlannedRow['kind'];
           let spec: RowSpec;
           let cyclePos = 0;
+          let cycleIndex = -1;
           if (!prev) {
             kind = 'foundation';
             spec = p.foundation;
@@ -77,7 +80,8 @@ export function planDesign(d: DesignContent): Plan {
           } else {
             kind = 'cycle';
             cyclePos = prev.cyclePos;
-            spec = p.cycle[cyclePos % p.cycle.length]!;
+            cycleIndex = cyclePos % p.cycle.length;
+            spec = p.cycle[cycleIndex]!;
             cyclePos++;
           }
           const odd = n % 2 === 1;
@@ -90,6 +94,7 @@ export function planDesign(d: DesignContent): Plan {
             line: l,
             rep,
             kind,
+            cycleIndex,
             spec,
             r: p.fits(d.width) ? repeats(spec, d.width) : null,
             belowHasSpaces: prev?.hasSpaces ?? false,
